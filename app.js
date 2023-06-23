@@ -2,6 +2,7 @@ const express = require("express")
 
 require("dotenv").config()
 const nodemailer = require("nodemailer")
+const fs = require("fs")
 
 const PORT = process.env.PORT || 3000
 
@@ -19,6 +20,28 @@ const transporter = nodemailer.createTransport({
   }); 
 
 app.use("/submit", sendEmail)
+app.use("/download", downloadResume)
+
+//Function to download the resume
+async function downloadResume(req,res) {
+    //path to the pdf file on the server
+    const filePath = "./utils/testfile.pdf"
+    //check if the file exists
+    fs.access(filePath, fs.constants.R_OK, (err)=>{
+        if(err){
+            res.status(400).send("file not found")
+            return 
+        }
+        //set appropriate headers for pdf download
+        res.setHeader('Content-disposition', 'attachment; filename=file.pdf');
+        res.setHeader('Content-type', 'application/pdf');
+
+        // Read the file and stream it to the response
+        const fileStream = fs.createReadStream(filePath)
+        fileStream.pipe(res)
+        console.log("file downloaded")
+    })
+}
 
 // Function to send the email
 async function sendEmail(req,res) {
@@ -60,16 +83,6 @@ async function sendEmail(req,res) {
   }
 }
 
-// // Example usage
-// const formSubmission = {
-//   email: 'prajjawal.tiwari@niveussolutions.com',
-//   subject: 'trial mail',
-//   text: 'Hello, I have a question.',
-// };
-
-// sendEmail(formSubmission);
-
-//serve static files
 app.use(express.static("public"))
 
 app.listen(PORT,()=>{
