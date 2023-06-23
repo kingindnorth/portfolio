@@ -25,7 +25,7 @@ app.use("/download", downloadResume)
 //Function to download the resume
 async function downloadResume(req,res) {
     //path to the pdf file on the server
-    const filePath = "./utils/testfile.pdf"
+    const filePath = "./utils/myResume.pdf"
     //check if the file exists
     fs.access(filePath, fs.constants.R_OK, (err)=>{
         if(err){
